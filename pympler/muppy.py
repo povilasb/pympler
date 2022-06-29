@@ -94,6 +94,7 @@ def leaked() -> list[Any]:
     return objects_by_ids(leaked_ids)
 
 
+
 def get_size(objects: List[Any]) -> int:
     """Compute the total size of all elements in objects."""
     res = 0
@@ -178,6 +179,10 @@ def filter(objects: List[Any], Type: Optional[type] = None, min: int = -1,
     if max > -1:
         objects = [o for o in objects if asizeof(o) < max]
     return objects
+
+
+def leaked_dicts() -> list[dict]:
+    return filter(leaked(), Type=dict, min=30000)
 
 
 def get_referents(object: Any, level: int = 1) -> List[Any]:
