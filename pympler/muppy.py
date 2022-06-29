@@ -18,6 +18,12 @@ def ignore_object(obj: Any) -> bool:
     except ReferenceError:
         return True
 
+def safe_sizeof(obj) -> int:
+    try:
+        return asizeof(obj)
+    except Exception:
+        return 0
+
 
 def get_objects(remove_dups: bool = True, include_frames: bool = False
                 ) -> List[Any]:
@@ -88,8 +94,8 @@ def leaked() -> list[Any]:
     ids2 = ids_from_file("/tmp/o2.txt")
     ids3 = ids_from_file("/tmp/o2.txt")
 
-    leaked_ids = set([for i in ids3 if i in ids2 and i not in ids1])
-    ids_to_file("/tmp/leaked.txt")
+    leaked_ids = set([i for i in ids3 if i in ids2 and i not in ids1])
+    ids_to_file(leaked_ids, "/tmp/leaked.txt")
 
     return objects_by_ids(leaked_ids)
 
@@ -175,9 +181,9 @@ def filter(objects: List[Any], Type: Optional[type] = None, min: int = -1,
     if Type is not None:
         objects = [o for o in objects if isinstance(o, Type)]
     if min > -1:
-        objects = [o for o in objects if asizeof(o) > min]
+        objects = [o for o in objects if safe_sizeof(o) > min]
     if max > -1:
-        objects = [o for o in objects if asizeof(o) < max]
+        objects = [o for o in objects if safe_sizeof(o) < max]
     return objects
 
 
