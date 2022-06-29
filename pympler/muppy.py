@@ -9,7 +9,7 @@ from inspect import isframe, stack
 
 from sys import getsizeof
 
-from pympler.asizeof import _Py_TPFLAGS_HAVE_GC
+from pympler.asizeof import _Py_TPFLAGS_HAVE_GC, asizeof
 
 
 def ignore_object(obj: Any) -> bool:
@@ -59,6 +59,28 @@ def get_objects(remove_dups: bool = True, include_frames: bool = False
         for sf in stack()[2:]:
             res.append(sf[0])
     return res
+
+
+def get_objects_ids() -> set[int]:
+    return set([id(o) for o in get_objects()])
+
+
+def objects_by_ids(ids: set[int] | int) -> list[Any] | Any:
+    all_objs = get_objects()
+    if isinstance(ids, set):
+        return [o for o in all_objs if id(o) in ids]
+    else:
+        return next(o for o in all_objs if id(o) == ids)
+
+
+def ids_to_file(ids: set[int], fname: str) -> None:
+    with open(fname, "w") as f:
+        f.write("\n".join([str(i) for i in ids]))
+
+
+def ids_from_file(fname: str) -> set[int]:
+    with open(fname, "r") as f:
+        return set([int(l) for l in f.readlines()])
 
 
 def get_size(objects: List[Any]) -> int:
@@ -141,9 +163,9 @@ def filter(objects: List[Any], Type: Optional[type] = None, min: int = -1,
     if Type is not None:
         objects = [o for o in objects if isinstance(o, Type)]
     if min > -1:
-        objects = [o for o in objects if getsizeof(o) > min]
+        objects = [o for o in objects if asizeof(o) > min]
     if max > -1:
-        objects = [o for o in objects if getsizeof(o) < max]
+        objects = [o for o in objects if asizeof(o) < max]
     return objects
 
 
