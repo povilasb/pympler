@@ -83,6 +83,17 @@ def ids_from_file(fname: str) -> set[int]:
         return set([int(l) for l in f.readlines()])
 
 
+def leaked() -> list[Any]:
+    ids1 = ids_from_file("/tmp/o1.txt")
+    ids2 = ids_from_file("/tmp/o2.txt")
+    ids3 = ids_from_file("/tmp/o2.txt")
+
+    leaked_ids = set([for i in ids3 if i in ids2 and i not in ids1])
+    ids_to_file("/tmp/leaked.txt")
+
+    return objects_by_ids(leaked_ids)
+
+
 def get_size(objects: List[Any]) -> int:
     """Compute the total size of all elements in objects."""
     res = 0
