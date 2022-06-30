@@ -92,7 +92,7 @@ def ids_from_file(fname: str) -> set[int]:
 def leaked() -> list[Any]:
     ids1 = ids_from_file("/tmp/o1.txt")
     ids2 = ids_from_file("/tmp/o2.txt")
-    ids3 = ids_from_file("/tmp/o2.txt")
+    ids3 = ids_from_file("/tmp/o3.txt")
 
     leaked_ids = set([i for i in ids3 if i in ids2 and i not in ids1])
     ids_to_file(leaked_ids, "/tmp/leaked.txt")
